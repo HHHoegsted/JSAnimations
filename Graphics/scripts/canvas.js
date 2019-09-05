@@ -27,14 +27,14 @@ let c = canvas.getContext('2d');
 
 //c.lineWidth = 2;
 
-//function getRandomColor() {
-//    var letters = '0123456789ABCDEF';
-//    var color = '#';
-//    for (var i = 0; i < 6; i++) {
-//        color += letters[Math.floor(Math.random() * 16)];
-//    }
-//    return color;
-//}
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
 //for (var i = 0; i < 50; i++) {
 //    let x = Math.random() * innerWidth;
@@ -76,14 +76,55 @@ let c = canvas.getContext('2d');
 
 //animate();
 
-function getRandomColor() {
-    let colorValue = function () {
-        return Math.floor(Math.random(256));
-    };
-
-    return `rgb(${colorValue},${colorValue},${colorValue})`;
+function Circle(x, y, r, dx, dy, color) {
+    this.x = x;
+    this.y = y;
+    this.r = r;
+    this.dx = dx;
+    this.dy = dy;
+    this.color = color;
 }
 
-function Circle(x, y, r, dx, dy) {
+Circle.prototype.draw = function () {
+    c.beginPath();
+    c.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false);
+    c.strokeStyle = 'black';
+    c.fillStyle = this.color;
+    c.fill();
+    c.stroke();
+};
 
+Circle.prototype.animate = function () {
+    this.draw();
+    this.x += this.dx;
+    this.y += this.dy;
+    if (this.x > window.innerWidth-this.r || this.x < this.r) {
+        this.dx = -this.dx;
+        this.color = getRandomColor();
+    }
+    if (this.y > window.innerHeight - this.r || this.y < this.r) {
+        this.dy = -this.dy;
+        this.color = getRandomColor();
+    }
+};
+
+function animate() {
+    requestAnimationFrame(this.animate);
+    c.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    for (var i = 0; i < circles.length; i++) {
+        circles[i].animate();
+    }
 }
+
+let circles = [];
+
+for (var i = 0; i < 100; i++) {
+    let x = Math.random() * window.innerWidth;
+    let y = Math.random() * window.innerHeight;
+    let r = Math.floor(10 + Math.random() * 10);
+    let dx = Math.random() * 16;
+    let dy = Math.random() * 16;
+    let color = getRandomColor();
+    circles.push(new Circle(x, y, r, dx, dy, color));
+}
+animate();
